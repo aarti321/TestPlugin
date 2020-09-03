@@ -48,8 +48,8 @@ function list_of_users(){
 
 function enqueue_user_scripts() {
     // Enqueue script
-    wp_register_script('my_script', plugins_url() . '/Testplugin/assests/my.js', array('jquery'), '1.2.3', false);
-    wp_enqueue_style('my_script', plugins_url() . '/Testplugin/assests/mystyle.css');
+    wp_register_script('my_script', plugins_url() . '/Testplugin-master/assests/my.js', array('jquery'), '1.2.3', false);
+    wp_enqueue_style('my_script', plugins_url() . '/Testplugin-master/assests/mystyle.css');
     wp_enqueue_script('my_script');
     wp_localize_script( 'my_script', 'my_vars', array(
           'my_ajax_url' => admin_url( 'admin-ajax.php' ),
