@@ -5,7 +5,8 @@ jQuery(document).ready(function($) {
             type: 'POST',
             url: my_vars.my_ajax_url,
             data: {
-                action: "register_user_front_end",
+                nonce:my_vars.ajax_nonce,
+                action: "list_user_front_end",
                 user_role: $('#user_role option:selected').val(),
                 user_order: $('#user_order option:selected').val(),
                 order_by: $('#order_by option:selected').val(),

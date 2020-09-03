@@ -17,54 +17,61 @@
 
 defined('ABSPATH')||exit;
 
-add_action('init','my_function');
+class TestPlugin{
+  public function __construct(){
+    add_action('init',array($this,'my_function'));
 
-
-function my_function()
+  }
+  function my_function()
   {
-    add_shortcode('user_table','list_of_users');
-    add_action('wp_enqueue_scripts', 'register_user_scripts');
-    add_action('wp_ajax_register_user_front_end', 'register_user_front_end_cv');
-    add_action('wp_ajax_nopriv_register_user_front_end', 'register_user_front_end_cv');
+    add_shortcode('user_table',array($this,'list_of_users'));
+    add_action('wp_enqueue_scripts', array($this,'enqueue_user_scripts'));
+    add_action('wp_ajax_list_user_front_end', array($this,'list_user_front_list'));
+    add_action('wp_ajax_nopriv_register_user_front_end', array($this,'list_user_front_list'));
 
   }
 
 function list_of_users(){
+  ob_start();
   if( is_user_logged_in() and current_user_can('administrator')){
     include_once dirname(__FILE__).'/user_table.php';
   }
   else{
-    _e('This is Restricted');
+    _e('This is Restricted','testplugin');
     exit;
   }
     
     
-
+  return ob_get_clean();
 }
 
 
-function register_user_scripts() {
+function enqueue_user_scripts() {
     // Enqueue script
     wp_register_script('my_script', plugins_url() . '/Testplugin/assests/my.js', array('jquery'), '1.2.3', false);
     wp_enqueue_style('my_script', plugins_url() . '/Testplugin/assests/mystyle.css');
     wp_enqueue_script('my_script');
     wp_localize_script( 'my_script', 'my_vars', array(
           'my_ajax_url' => admin_url( 'admin-ajax.php' ),
+          'ajax_nonce' => wp_create_nonce('user_list'),
+
         )
     );
  }
 
- function register_user_front_end_cv() {
+ function list_user_front_list() {
    
-  $user_role = $_POST['user_role'];
-    $user_order = $_POST['user_order'];
-    $order_by = $_POST['order_by'];
+   check_ajax_referer('user_list','nonce');
+    $user_order = sanitize_key($_POST['user_order']);
+    $order_by = sanitize_key($_POST['order_by']);
+    $user_role = sanitize_key($_POST['user_role']);
 
     
     $args1 = array(
-      'role' => $user_role,
+      
       'order' =>  $user_order,
       'orderby' =>  $order_by,
+      'role' => $user_role,
      );
     
     global  $wpdb;
@@ -76,9 +83,6 @@ function register_user_scripts() {
           ORDER BY ".$args1['orderby']." ".$args1['order']." ");
 
     $result = json_decode(json_encode($result), true);   
-    
-
-   
     echo json_encode($result);
 
    
@@ -87,3 +91,9 @@ function register_user_scripts() {
  
   
  }
+}
+new TestPlugin;
+
+
+
+
