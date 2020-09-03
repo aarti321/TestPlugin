@@ -4,9 +4,6 @@
 <title>User Listing</title>
 
 
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.js"></script>
-
-
 <body>
 
     <div> 
